@@ -1,0 +1,82 @@
+
+How to Setup Local Yum Repository using installation DVD or ISO on RHEL 8 .
+
+Repositories are generally stored on a public network, which can be accessedby multiple users on the internet. However, you can create your own local repositoryon your server and access, it as a single user or allow access to other machines on your local Network.
+
+RHEL 8, we have two package repositories:
+
+1: BaseOS
+
+2: Application Stream
+
+BaseOS 
+
+Repository will contain packages like OS installation packages, Administrative tools packages and their dependencies.
+
+AppStream 
+
+Repository will have all remaining packages like vim, PostgreSQL, MariaDB, Maven, Bind, LibreOffice and all other application and OS related dependencies.
+
+Let us begin with creating a local Yum Repo.
+
+you need to mount the DVD-ROM or mounted ISO in your virtual machine follow the below steps. For demonstration purpose, we are mounting under /mnt.
+
+# mount -o loop   /dev/sr0   /mnt/
+
+Now copy Rhel 8.0 iso to folder. First create folder and copy the iso into folder
+
+# mkdir rhel.8_dvd
+
+Now copy iso to folder
+
+# cp -avr  /mnt   /rhel.8_dvd
+
+
+Now move the existing repo files to /tmp or create a folder and move the files
+
+
+# mv /etc/yum.repos.d/*.repo /tmp/
+
+
+Create a repo file under /etc/yum.repos.d directory.
+
+# vim  /etc/yum.repos.d/Rhel_8.0.repo
+
+
+#BaseOS
+
+[Rhel.8.0_BaseOS]
+name= Rhel.8.0_BaseOS
+baseurl= file:///rhel.8_dvd/BaseOS
+enabled=1
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+
+#App Stream
+
+[Rhel.8.0_AppStream]
+name= Rhel.8.0_ AppStream
+baseurl= file:///rhel.8_dvd/AppStream
+enabled=1
+gpgcheck=1
+gpgkey= file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+
+
+save and exit
+
+
+
+Details about repo directives:
+
+[name.repo]                 Name of the Section
+name                            Name of the repository
+baseurl                         Location of the package
+Enabled                       Enable repository
+gpgcheck                     Enable secure installation and gpgcheck is optional If you set gpgcheck=0, there is no need to mention gpgkey.
+
+gpgkey                         Location of the key
+
+Now try to install any package:
+Yum clean all
+
+Yum install vsftpd
